@@ -15,8 +15,9 @@ n=$(($num_words*5))
 # Note the use of https/ssl, no leaking here
 throws=$(curl --silent "https://www.random.org/integers/?num=$n&min=1&max=6&col=1&base=10&format=plain&rnd=new") 
 
-# Get the wordlist
-words=$(curl --silent "http://world.std.com/%7Ereinhold/beale.wordlist.asc")
+# Get the wordlist (choose one, the original or Beale's list with shorter words)
+# words=$(curl --silent "http://world.std.com/%7Ereinhold/beale.wordlist.asc")
+words=$(curl --silent "http://world.std.com/%7Ereinhold/diceware.wordlist.asc")
 
 
 # Number of dice rolls processed
