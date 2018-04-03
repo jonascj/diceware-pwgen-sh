@@ -15,10 +15,14 @@ n=$(($num_words*5))
 # Note the use of https/ssl, no leaking here
 throws=$(curl --silent "https://www.random.org/integers/?num=$n&min=1&max=6&col=1&base=10&format=plain&rnd=new") 
 
-# Get the wordlist (choose one, the original or Beale's list with shorter words)
-# words=$(curl --silent "http://world.std.com/%7Ereinhold/beale.wordlist.asc")
-words=$(curl --silent "http://world.std.com/%7Ereinhold/diceware.wordlist.asc")
+# Obtain a wordlist to choose words from
+# Below are A. Reinhold's original list, Beale's modified list
+# and finaly EFF's 2016 wordlist. Choose one and uncomment. 
+#wordlist_url="http://world.std.com/%7Ereinhold/diceware.wordlist.asc"
+#wordlist_urls="http://world.std.com/%7Ereinhold/beale.wordlist.asc"
+wordlist_url="https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt"
 
+words=$(curl --silent $wordlist_url)
 
 # Number of dice rolls processed
 m=0 
