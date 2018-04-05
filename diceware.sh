@@ -5,7 +5,6 @@
 # Use as "diceware.sh n" for a passphrase of n words.
 # No error handling implemented.
 
-# Only argument is number of words (no error checking)
 num_words=$1
 
 # Number of integers (dice throws) to request 
@@ -16,12 +15,11 @@ n=$(($num_words*5))
 throws=$(curl --silent "https://www.random.org/integers/?num=$n&min=1&max=6&col=1&base=10&format=plain&rnd=new") 
 
 # Obtain a wordlist to choose words from
-# Below are A. Reinhold's original list, Beale's modified list
-# and finaly EFF's 2016 wordlist. Choose one and uncomment. 
-#wordlist_url="http://world.std.com/%7Ereinhold/diceware.wordlist.asc"
-#wordlist_urls="http://world.std.com/%7Ereinhold/beale.wordlist.asc"
+# Use any you like, as long as it has format
+# 11111    apple 
+# 11112    pear
+# Here I've used EFF's from 2016 which I much prefer
 wordlist_url="https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt"
-
 words=$(curl --silent $wordlist_url)
 
 # Number of dice rolls processed
@@ -50,6 +48,5 @@ for t in $throws; do
        # Print the word
        echo $word
     fi
-        
-done
 
+done
