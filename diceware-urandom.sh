@@ -1,25 +1,19 @@
 #!/bin/sh
-# Generate a diceware passphrase using /dev/urandom as source
-# of random numbers, a posix shell, curl, od and grep.
+# Generate a passphrase using the diceware method but with 
+# /dev/urandom as source of random numbers.
 #
-# Use as "diceware-urandom.sh n" for a passphrase of n words.
+# Use as "./diceware-urandom.sh n" for a passphrase of n words.
 # No error handling implemented.
 #
-# Credit to https://serverfault.com/a/718202 for the idea of 
-# using the 'od' util to format bytes from /dev/urandom.
+# http://world.std.com/~reinhold/diceware.html
 
 
-###################################################
-# Rolls a 6-sided die n times and prints a list of 
-# number of dots "shown". Cryptographically secure 
-# because it uses /dev/urandom unbiased to obtain
-# integers for the rolls.
+###################################################################### 
+# Rolls a 6-sided die n times and prints the rolls. Cryptographically 
+# secure since it relies on /dev/urandom for random bytes.
 # 
-# Arguments: 
-#   $1, n, number of rolls to perform
-# Returns:
-#   Prints the number of dots for each role
-#   on seperate lines.
+# Arguments: $1, n, number of rolls to perform
+# Returns: Prints the result of one roll per line
 ###################################################
 roll()
 {
@@ -32,8 +26,7 @@ roll()
     # Draw random numbers in batches until n have been printed
     while [ $m -lt $n ]; do
 
-        # Draw n-m random integers from /dev/urandom
-        # These are uniformly distributed over [0,255]
+        # Draw n-m random integers from /dev/urandom. Uniform on [0,255].
         xs=$(od -v -A n -N $(($n-$m)) -t u1 < /dev/urandom)
    
         # Process each random integer
@@ -46,7 +39,7 @@ roll()
                 # Increment the number of rolls produced
                 m=$(($m+1))
 
-                # Map to [1,6] and output
+                # Map to [1,6] and print 
                 echo $((x%6 + 1))
                 
                 # Break if n rolls have been produced 
@@ -62,26 +55,21 @@ roll()
 # Main task/flow
 ##########################################
 
-# Argument: number of words in passphrase 
+# Command line argument
 num_words=$1
 
 # Get num_words*5 integers (5 dice rolls per word)
 n=$(($num_words*5))
 rs=$(roll $n)
 
-# Obtain a wordlist to choose words from
-# Use any you like, as long as it has format
-# 11111    apple 
-# 11112    pear
-# Here I've used EFF's from 2016 which I much prefer
+# Obtain a wordlist to choose words from [1]. 
 wordlist_url="https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt"
 words=$(curl --silent $wordlist_url)
 
-# Number of dice rolls processed so far
+# Number of dice rolls processed
 m=0 
 
-# String holding number of dots shown for five rolls, 
-# e.g. 33246, used for lookup in the wordlist.
+# Result of five rolls, e.g. 33246
 s="" 
 
 # Use rolls in sets of five to look up words
@@ -98,10 +86,17 @@ for r in $rs; do
        # Look up the word
        word=$(echo "$words" | grep $s) 
 
-       # Print the word (and five-roll-lookup-string)
+       # Print the word (and five-roll-lookup-string also returned by grep)
        echo $word
 
        # Reset s to an empty string
        s=""
     fi
 done
+
+
+# [1] Use any wordlist you so desire, as long as 'grep 54356 your-list.txt'
+# will obtain the word corresponding to rolling 5, 4, 3, 5, 6.
+# Other choices could be:
+# Diceware wordlist: http://world.std.com/%7Ereinhold/diceware.wordlist.asc
+# Beale's list: http://world.std.com/%7Ereinhold/beale.wordlist.asc
